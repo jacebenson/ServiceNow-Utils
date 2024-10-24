@@ -1,5 +1,14 @@
 # CHANGELOG.md
 
+## 8.2.2.1 (2024-10-24)
+Fixes / changes:
+  - Minor update for Autocomplete for slash command switches (Slack)
+
+## 8.2.2.0 (2024-10-23)
+Fixes / changes:
+  - Autocomplete for slash command switches, i.e. -u (Slack)
+  - Allow - and _ character in slash commands and switches (Slack)
+
 ## 8.2.1.4 (2024-10-21)
 Fixes / changes:
   - Fix Doubleclick refrence icon on catalog item variables in the formatter (LinkedIn post comment)
