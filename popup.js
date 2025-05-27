@@ -1434,6 +1434,14 @@ function getSlashcommands() {
             objCustomCommands = JSON.parse(objSettings.slashcommands);
         } catch (e) { };
 
+        // Check if there are custom commands and show warning if there are
+        const warningEl = document.getElementById('warningBackup');
+        if (warningEl && objCustomCommands && Object.keys(objCustomCommands).length > 0) {
+            warningEl.style.display = 'block';
+        } else if (warningEl) {
+            warningEl.style.display = 'none';
+        }
+
         Object.keys(objCustomCommands).forEach(function (key) {
             dataslashcommands.push({ "command": key, "url": objCustomCommands[key].url, "hint": snuEncodeHtml(objCustomCommands[key].hint), "fields": objCustomCommands[key].fields, "overwriteurl" : objCustomCommands[key].overwriteurl, "order" : objCustomCommands[key].order,  "source": "1custom" });
         });
@@ -1538,6 +1546,11 @@ function getSlashcommands() {
         
         if (JSON.stringify(objCustomCommands).length > 2){
             $('#downloadcommands').on('click', downloadCommands).show();
+            // Add click handler to the backup link that calls the same download function
+            $('#backupCmdsLink').on('click', function(e) {
+                e.preventDefault();
+                downloadCommands();
+            });
         }
         else {
             $('#downloadcommands').hide();
@@ -1585,10 +1598,14 @@ function getSlashcommands() {
 
             chrome.runtime.sendMessage({ "event" : "initializecontextmenus"});
 
+            // Show the warning after saving a command
+            const warningEl = document.getElementById('warningBackup');
+            if (warningEl) {
+                warningEl.style.display = 'block';
+            }
         });
     });
 }
-
 function getShortcuts() {
     console.log("getShortcuts");
 
@@ -1762,7 +1779,7 @@ function setDataExplore(nme) {
     );
     
     if (dtDataExplore) dtTables.destroy();
-    //$('#dataexplore').html(DOMPurify.sanitize(nme));
+       //$('#dataexplore').html(DOMPurify.sanitize(nme));
     dtDataExplore = $('#dataexplore').DataTable({
         "aaData": nme,
         "aoColumns": [

@@ -1,4 +1,15 @@
 # CHANGELOG.md
+## 9.0.0.0 (2025-05-28)
+Features:
+  - SN Utils is 9 years old! 🎉 => Version 9.0.0.0
+  - Adding /naa Now Assist ai Agents studio and /nas Now Assist Skill kit slash commands (LinkedIn) 
+  - Add support for CSV files in the attachment preview window
+Fixes / changes:
+  - Adding reminders and links to download custom slash commands to prevent data loss (email)
+  - More reliable initialisation of slash commands popup div (Issue #582)
+  - Some text adjustments, typo fixes.
+
+
 ## 8.2.8.0 (2025-04-24)
 Features:
   - Add Debug Pane to Nodes tab with indicationif it is a RaptorDB instance (Teams / LinkedIn)

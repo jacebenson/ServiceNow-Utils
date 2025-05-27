@@ -49,7 +49,43 @@ document.querySelector('button#save').addEventListener('click', e => {
     saveSettings();
 });
 
+// Add functionality for the download link
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('downloadContent').addEventListener('click', function(e) {
+        e.preventDefault();
+        downloadEditorContent();
+    });
+});
 
+/**
+ * Downloads the editor content as a text file
+ */
+function downloadEditorContent() {
+    // Get monaco editor content from the global editor variable
+    let content = '';
+    if (typeof editor !== 'undefined' && editor) {
+        content = editor.getValue();
+    }
+    
+    // Get the setting name from URL parameters to use as filename
+    const params = new URLSearchParams(window.location.search);
+    const settingName = params.get('setting') || 'settings';
+    
+    // Create download link
+    const blob = new Blob([content], {type: 'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = settingName + '.json.txt';
+    document.body.appendChild(a);
+    a.click();
+    
+    // Cleanup
+    setTimeout(function() {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }, 100);
+}
 
 function addActions(editor) {
 

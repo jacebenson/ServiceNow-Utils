@@ -60,14 +60,19 @@ a:active {
 	background-color: var(--sn-brand-blue);
 	color: #fff;
 }
+
+.record-meta {
+	font-size: 15px;
+	padding: 8px 0;
+}
 .record-meta label.record-meta--label {
 	font-weight: 600;
 	display: inline-block;
-	padding-right:0.5rem;
+	padding-right: 0.75rem;
 }
 .record-meta span.record-meta--detail {
 	display: inline-block;
-	margin-right:1rem;
+	margin-right: 1.25rem;
 }
 
 
@@ -175,6 +180,7 @@ button:hover {
 	margin-left: auto;
 	font-size: var(--base-font-size);
 	margin-right: 1rem;
+	padding: 8px 0;
 }
 
 select.versions {
@@ -204,7 +210,29 @@ select.versions option {
 	font-family: 'Courier New', Courier, monospace;
 }
 
+/* Download link styles */
+.download-link {
+	display: inline-block;
+	font-weight: 100;
+}
+
+.download-link a {
+	color: #ff8c00;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	font-size: 15px;
+	font-weight: 500;
+	transition: all 0.2s ease;
+}
+
+.download-link a:hover {
+	text-decoration: underline;
+}
+
+
+
 a.version {
 	text-decoration: none;
 	display: none;
-}	
+}

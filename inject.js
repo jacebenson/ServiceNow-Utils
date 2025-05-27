@@ -178,6 +178,14 @@ var snuslashcommands = {
         "url": "sys_user.do?sys_id=javascript:gs.getUserID()",
         "hint": "Open My User profile"
     },
+        "naa": {
+        "url": "now/agent-studio/overview",
+        "hint": "Now Assist ai Agents studio"
+    },
+        "nas": {
+        "url": "now/now-assist-skillkit/skills",
+        "hint": "Now Assist Skill kit"
+    },
     "p": {
         "url": "sys_properties_list.do?sysparm_query=nameLIKE$0",
         "hint": "Filter Properties <name>",
@@ -336,7 +344,7 @@ var snuslashcommands = {
     },
     "um": {
         "url": "javascript:snuSetAllMandatoryFieldsToFalse()",
-        "hint": "UnManadtory; Set all mandatory fields to false (Admin only)"
+        "hint": "UnMandatory; Set all mandatory fields to false (Admin only)"
     },
     "up": {
         "url": "sys_ui_policy_list.do?sysparm_query=short_descriptionLIKE$0^ORDERBYDESCsys_updated_on",
@@ -353,7 +361,7 @@ var snuslashcommands = {
     },
     "ois": {
         "url": "*",
-        "hint": "Open record in open ServiceNow Studio tab (Beta)"
+        "hint": "Open record in open ServiceNow Studio tab"
     },
     "wf": {
         "url": "/workflow_ide.do?sysparm_nostack=true",
@@ -1824,8 +1832,6 @@ function snuSettingsAdded() {
 
     if (snusettings.slashoption != "off") {
         snuAddFilterListener();
-        snuSlashCommandAddListener();
-
     }
     if (snusettings.s2ify) {
         if (typeof snuS2Ify != 'undefined') snuS2Ify();
@@ -1859,7 +1865,6 @@ function snuSettingsAdded() {
         snuAddPreviewAttachmentLinks();
 
     }
-
 
     if (snusettings.hasOwnProperty("slashcommands")) {
         try {
@@ -3605,28 +3610,68 @@ function snuSetShortCuts() {
 
     var htmlFilter = document.createElement('div');
     var snudirectlinks = (snunumbernav) ? '' : 'snudirectlinksdisabled';
-    var cleanHTML = DOMPurify.sanitize(divstyle +
-        `<div class="snutils -polaris" style="display:none;"><div class="snuheader"><a id='cmdhidedot' class='cmdlink'  href="#">
-    <svg style="height:16px; width:16px;"><circle cx="8" cy="8" r="5" fill="#FF605C" /></svg></a> Slash commands <span id="snuslashcount" style="font-weight:normal;"></span><span style="float:right; font-size:8pt; line-height: 0pt;">
-    <a style=" font-family:Helvetica,Ariel;text-decoration:none; display:flex; align-items:center;" href="https://www.linkedin.com/company/sn-utils/posts/" target="_blank" class="snuflash">Follow #snutils on  
-    <?xml version="1.0" ?><svg style="margin:3px;" height="14" viewBox="0 0 72 72" width="14" xmlns="http://www.w3.org/2000/svg">
-    <g fill="none" fill-rule="evenodd"><path d="M8,72 L64,72 C68.418278,72 72,68.418278 72,64 L72,8 C72,3.581722 68.418278,-8.11624501e-16 64,0 L8,0 C3.581722,8.11624501e-16 -5.41083001e-16,3.581722 0,8 L0,64 C5.41083001e-16,68.418278 3.581722,72 8,72 Z" fill="#007EBB"/>
-    <path d="M62,62 L51.315625,62 L51.315625,43.8021149 C51.315625,38.8127542 49.4197917,36.0245323 45.4707031,36.0245323 C41.1746094,36.0245323 38.9300781,38.9261103 38.9300781,43.8021149 L38.9300781,62 L28.6333333,62 L28.6333333,27.3333333 L38.9300781,27.3333333 
-    L38.9300781,32.0029283 C38.9300781,32.0029283 42.0260417,26.2742151 49.3825521,26.2742151 C56.7356771,26.2742151 62,30.7644705 62,40.051212 L62,62 Z M16.349349,22.7940133 C12.8420573,22.7940133 10,19.9296567 10,16.3970067 C10,12.8643566 12.8420573,10 16.349349,10 
-    C19.8566406,10 22.6970052,12.8643566 22.6970052,16.3970067 C22.6970052,19.9296567 19.8566406,22.7940133 16.349349,22.7940133 Z M11.0325521,62 L21.769401,62 L21.769401,27.3333333 L11.0325521,27.3333333 L11.0325521,62 Z" fill="#FFF"/></g>
-    </svg></a> &nbsp;</span></div>
-    <input id="snufilter" name="snufilter" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-autocomplete="both" aria-haspopup="false" class="snutils" type="text" placeholder='SN Utils Slashcommand' > </input>
-    <ul id="snuhelper"></ul>
-    <div id="snudirectlinks" class="${snudirectlinks}"></div>
-    <div id="snuswitches"></div>
-    </div>`, { FORCE_BODY: true, ADD_ATTR: ['target'] });
-    htmlFilter.innerHTML = cleanHTML
-    if (!window.top.document.querySelectorAll('#snufilter').length) { //prevent reinject 
-        window.top.document.body.appendChild(htmlFilter);
-        window.top.document.getElementById('cmdhidedot').addEventListener('click', evt => { snuSlashCommandHide(false, evt) });
-        window.top.document.getElementById('snufilter').addEventListener('focus', function () { this.select() });
+
+    function snuSlashCommandGenerateElement() {
+        if (window.top.document.querySelector('.snutils.-polaris')) return;
+        const htmlFilter = document.createElement('div');
+        const cleanHTML = DOMPurify.sanitize(
+            divstyle +
+            `<div class="snutils -polaris" style="display:none;">
+                <div class="snuheader">
+                    <a id='cmdhidedot' class='cmdlink' href="#"><svg style="height:16px; width:16px;">
+                            <circle cx="8" cy="8" r="5" fill="#FF605C" />
+                        </svg></a> 
+                    Slash commands 
+                    <span id="snuslashcount" style="font-weight:normal;"></span>
+                    <span style="float:right; font-size:8pt; line-height: 0pt;">
+                        <a style="font-family:Helvetica,Ariel;text-decoration:none; display:flex; align-items:center;" 
+                        href="https://www.linkedin.com/company/sn-utils/posts/" target="_blank" class="snuflash">
+                            Follow #snutils on
+                            <svg style="margin:3px;" height="14" viewBox="0 0 72 72" width="14" xmlns="http://www.w3.org/2000/svg">
+                                <g fill="none" fill-rule="evenodd">
+                                    <path d="M8,72 L64,72 C68.418278,72 72,68.418278 72,64 L72,8 C72,3.581722 68.418278,0 64,0 L8,0 C3.581722,0 0,3.581722 0,8 L0,64 C0,68.418278 3.581722,72 8,72 Z" fill="#007EBB"/>
+                                    <path d="M62,62 L51.315625,62 L51.315625,43.8021149 C51.315625,38.8127542 49.4197917,36.0245323 45.4707031,36.0245323 C41.1746094,36.0245323 38.9300781,38.9261103 38.9300781,43.8021149 L38.9300781,62 L28.6333333,62 L28.6333333,27.3333333 L38.9300781,27.3333333 
+                                    L38.9300781,32.0029283 C38.9300781,32.0029283 42.0260417,26.2742151 49.3825521,26.2742151 C56.7356771,26.2742151 62,30.7644705 62,40.051212 L62,62 Z M16.349349,22.7940133 C12.8420573,22.7940133 10,19.9296567 10,16.3970067 C10,12.8643566 
+                                    12.8420573,10 16.349349,10 C19.8566406,10 22.6970052,12.8643566 22.6970052,16.3970067 C22.6970052,19.9296567 19.8566406,22.7940133 16.349349,22.7940133 Z M11.0325521,62 L21.769401,62 L21.769401,27.3333333 L11.0325521,27.3333333 L11.0325521,62 Z" 
+                                    fill="#FFF"/>
+                                </g>
+                            </svg>
+                        </a> &nbsp;
+                    </span>
+                </div>
+                <input id="snufilter" name="snufilter" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" 
+                    aria-autocomplete="both" aria-haspopup="false" class="snutils" type="text" 
+                    placeholder='SN Utils Slashcommand' />
+                <ul id="snuhelper"></ul>
+                <div id="snudirectlinks" class="${snudirectlinks}"></div>
+                <div id="snuswitches"></div>
+            </div>`, 
+            { FORCE_BODY: true, ADD_ATTR: ['target'] }
+        );
+
+        htmlFilter.innerHTML = cleanHTML;
+
+        try {
+            window.top.document.body.appendChild(htmlFilter);
+            const snufilter = window.top.document.getElementById('snufilter');
+            const hidedot = window.top.document.getElementById('cmdhidedot');
+            hidedot?.addEventListener('click', evt => snuSlashCommandHide(false, evt));
+            snufilter?.addEventListener('focus', function () { this.select(); });
+            snuSlashCommandAddListener();
+
+        } catch (e) {
+            console.warn('Failed to inject SN Utils UI:', e);
+        }
     }
-    snuSlashCommandAddListener();
+
+    // Wait for DOM if needed #582
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            snuSlashCommandGenerateElement();
+        });
+    } else {
+        snuSlashCommandGenerateElement();
+    }
 
     document.addEventListener("keydown", (event) => {
 
@@ -6024,19 +6069,31 @@ async function snuPreviewAttachmentsModal(attSysId){
         display: flex;
         width: 100%;
         height: 80vh;
+        max-height: 80vh;
+        overflow: hidden;
+    }
+    
+    /* Ensure GlideModal properly contains our content */
+    .modal-dialog {
+        max-height: 90vh;
     }
 
     #snuAttatchmentNav {
         width: 20%;
         overflow-y: auto;
+        flex-shrink: 0;
     }
 
     #snuAttatchmentContent {
         width: 80%;
-        padding: 10px;
+        padding: 5px;
         box-sizing: border-box;
         border: 1px solid #ccc;
-        padding: 5px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 100%; /* Take up the full height */
+        max-height: 100%; /* Ensure content doesn't exceed container height */
     }
 
     #snuAttatchmentNav ul {
@@ -6129,6 +6186,8 @@ async function snuPreviewAttachmentsModal(attSysId){
             listItem.style.backgroundImage = 'url(/images/icons/attach_project.gifx)';
         else if (att.extension.startsWith('xml')) 
             listItem.style.backgroundImage = 'url(/images/icons/attach_xml.gifx)';
+        else if (['csv'].includes(att.extension)) 
+            listItem.style.backgroundImage = 'url(/images/icons/attach_excel.gifx)';
         else if (['msg','eml'].includes(att.extension)) 
             listItem.style.backgroundImage = 'url(/images/icons/email.gifx)';
         else if (['ics'].includes(att.extension)) 
@@ -6155,7 +6214,7 @@ async function snuPreviewAttachmentsModal(attSysId){
     }
 
     const modal = new GlideModal('snuPreviewAttachments');
-    modal.setTitle('[SN Utils] Preview Attachments (beta)');
+    modal.setTitle('[SN Utils] Preview Attachments');
     modal.setBody(container);
 
     if (storedAtt) snuSetAttachmentPreview(storedAtt);
@@ -6288,6 +6347,365 @@ async function snuSetAttachmentPreview(att){
         iframe.style.height = '100%';
         content.appendChild(iframe);
     }
+    else if (['csv'].includes(att.extension)) {
+        const content = document.querySelector('#snuAttatchmentContent');
+        content.innerHTML = 'CSV file is being loaded, please wait...';
+        
+        let fileContent = await fetch(`/sys_attachment.do?sys_id=${att.sys_id}`).then(response => response.text());
+        content.innerHTML = '';
+        let span = document.createElement('span');
+        span.innerHTML = `
+        Download: <a href="/sys_attachment.do?sys_id=${att.sys_id}">${att.file_name}</a> | 
+        <a href="#" title="[SN Utils] Copy result to clipboard" onclick="snuCopyAttatchmentContent()" >
+        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linejoin="round" stroke-width="2" d="M9 8v3a1 1 0 0 1-1 1H5m11 4h2a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-7a1 1 0 0 0-1 1v1m4 3v10a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7.13a1 1 0 0 1 .24-.65L7.7 8.35A1 1 0 0 1 8.46 8H13a1 1 0 0 1 1 1Z"/>
+        </svg>
+        </a><span id="actionResult"></span>`;
+        content.appendChild(span);
+        
+        // Parse CSV
+        try {
+            // Clear existing content (keep only the download span we already added)
+            const downloadSpan = content.querySelector('span');
+            content.innerHTML = '';
+            content.appendChild(downloadSpan);
+            
+            // Create a wrapper for all CSV content
+            const csvWrapper = document.createElement('div');
+            csvWrapper.style.display = 'flex';
+            csvWrapper.style.flexDirection = 'column';
+            csvWrapper.style.height = '100%';
+            csvWrapper.style.width = '100%';
+            csvWrapper.style.overflow = 'hidden';
+            csvWrapper.style.maxHeight = 'calc(100% - 30px)'; // Leave space for the download span
+            
+            // Create search and display controls first - this needs to stay fixed at the top
+            const searchDiv = document.createElement('div');
+            searchDiv.style.flexShrink = '0'; // Don't shrink the controls
+            searchDiv.style.position = 'sticky';
+            searchDiv.style.top = '0';
+            searchDiv.style.zIndex = '10';
+            searchDiv.style.backgroundColor = 'white';
+            searchDiv.style.padding = '8px 0';
+            searchDiv.style.borderBottom = '1px solid #ccc';
+            searchDiv.innerHTML = `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+                    <input type="text" id="csvSearchInput" placeholder="Search CSV data..." 
+                        style="flex: 1; min-width: 200px; padding: 6px; box-sizing: border-box;">
+                    <div style="display: flex; gap: 8px; flex-wrap: nowrap;">
+                        <button id="csvExpandColumnsBtn" 
+                            style="padding: 6px; background-color: #f0f0f0; border: 1px solid #ccc; cursor: pointer;">
+                            Expand Columns
+                        </button>
+                        <button id="csvFixColumnWidthsBtn" 
+                            style="padding: 6px; background-color: #f0f0f0; border: 1px solid #ccc; cursor: pointer;">
+                            Fit Columns
+                        </button>
+                    </div>
+                </div>
+            `;
+            csvWrapper.appendChild(searchDiv);
+            
+            // Create table container that will take remaining space
+            const tableContainer = document.createElement('div');
+            tableContainer.style.overflow = 'auto'; // Enable scrolling
+            tableContainer.style.flexGrow = '1'; // Take up all remaining space
+            tableContainer.style.position = 'relative'; // For positioning table
+            tableContainer.style.maxHeight = 'calc(100% - 50px)'; // Leave space for the search controls
+            tableContainer.id = 'csvTableContainer'; // Add ID for easier targeting
+            
+            const table = document.createElement('table');
+            table.style.borderCollapse = 'collapse';
+            table.style.width = '100%';
+            table.style.fontSize = '0.9em';
+            table.style.tableLayout = 'fixed';  // Fixed table layout for better column control
+            table.style.margin = '0'; // Remove margin
+            table.style.maxWidth = '100%'; // Ensure the table doesn't exceed container width
+            table.setAttribute('border', '1');
+            table.id = 'snuCsvTable';
+            
+            // Parse the CSV correctly handling quoted values
+            function parseCSVRow(text) {
+                // Special case for empty rows
+                if (!text.trim()) return [];
+                
+                const result = [];
+                let cell = '';
+                let insideQuote = false;
+                let quoteChar = null;
+                
+                for (let i = 0; i < text.length; i++) {
+                    const char = text[i];
+                    
+                    if ((char === '"' || char === "'") && (!quoteChar || char === quoteChar)) {
+                        // Check for escaped quotes ("" or '')
+                        if (insideQuote && i + 1 < text.length && text[i + 1] === char) {
+                            cell += char;
+                            i++; // Skip the next quote
+                        } else {
+                            // Toggle quote state
+                            insideQuote = !insideQuote;
+                            if (insideQuote) {
+                                quoteChar = char;
+                            } else {
+                                quoteChar = null;
+                            }
+                        }
+                    } else if (char === ',' && !insideQuote) {
+                        // End of cell
+                        result.push(cell);
+                        cell = '';
+                    } else {
+                        cell += char;
+                    }
+                }
+                
+                // Add the last cell
+                result.push(cell);
+                
+                // Handle extra commas at the end of a row (common CSV issue)
+                const lastValue = result[result.length - 1];
+                if (lastValue === '' && text.endsWith(',')) {
+                    // If the last value is empty and the row ends with a comma, add an extra empty cell
+                    result.push('');
+                }
+                
+                return result;
+            }
+            
+            // Split file into rows
+            const rows = fileContent.trim().split(/\r?\n/).filter(row => row.trim());
+            if (rows.length === 0) {
+                throw new Error('Empty CSV file');
+            }
+            
+            // Create header row
+            const headerRow = document.createElement('tr');
+            headerRow.style.backgroundColor = '#f2f2f2';
+            headerRow.style.fontWeight = 'bold';
+            
+            const headers = parseCSVRow(rows[0]);
+            const columnCount = headers.length;
+            
+            // Calculate reasonable column widths based on number of columns
+            const baseColumnWidth = Math.min(250, Math.floor(800 / columnCount));
+            
+            headers.forEach((header, index) => {
+                const th = document.createElement('th');
+                th.textContent = header.trim().replace(/^["']|["']$/g, ''); // Remove quotes if present
+                th.style.padding = '8px';
+                th.style.maxWidth = `${baseColumnWidth}px`; // Adjust width based on column count
+                th.style.minWidth = '80px';
+                th.style.overflow = 'hidden';
+                th.style.textOverflow = 'ellipsis';
+                th.style.whiteSpace = 'nowrap';
+                th.title = th.textContent; // Show full content on hover
+                headerRow.appendChild(th);
+            });
+            table.appendChild(headerRow);
+            
+            // Add data rows
+            for (let i = 1; i < rows.length; i++) {
+                if (!rows[i].trim()) continue; // Skip empty rows
+                
+                const dataRow = document.createElement('tr');
+                dataRow.style.backgroundColor = i % 2 === 0 ? '#f9f9f9' : '#ffffff';
+                
+                const cells = parseCSVRow(rows[i]);
+                
+                // Calculate reasonable column widths based on number of columns (same as headers)
+                const baseColumnWidth = Math.min(250, Math.floor(800 / columnCount));
+                
+                // Ensure we don't exceed the column count (for corrupted data)
+                const cellsToProcess = cells.slice(0, columnCount);
+                
+                cellsToProcess.forEach((cell, idx) => {
+                    const td = document.createElement('td');
+                    
+                    // Clean the cell content
+                    let cleanedContent = cell.trim().replace(/^["']|["']$/g, ''); // Remove quotes if present
+                    
+                    td.textContent = cleanedContent;
+                    td.style.padding = '8px';
+                    td.style.maxWidth = `${baseColumnWidth}px`; // Match header width
+                    td.style.minWidth = '80px';
+                    td.style.overflow = 'hidden';
+                    td.style.textOverflow = 'ellipsis';
+                    td.style.whiteSpace = 'nowrap';
+                    td.title = cleanedContent; // Show full content on hover
+                    
+                    dataRow.appendChild(td);
+                });
+                
+                // If there are fewer cells than headers, add empty cells
+                while (dataRow.children.length < columnCount) {
+                    const td = document.createElement('td');
+                    td.style.padding = '8px';
+                    td.style.minWidth = '80px';
+                    dataRow.appendChild(td);
+                }
+                
+                table.appendChild(dataRow);
+            }
+            
+            tableContainer.appendChild(table);
+            csvWrapper.appendChild(tableContainer);
+            content.appendChild(csvWrapper);
+            
+            // Search controls are already added to csvWrapper at the top
+            
+            // Add search event listener
+            setTimeout(() => {
+                document.getElementById('csvSearchInput').addEventListener('keyup', function() {
+                    const searchValue = this.value.toLowerCase();
+                    const tableRows = document.querySelectorAll('#snuCsvTable tr');
+                    let visibleCount = 0;
+                    
+                    for (let i = 1; i < tableRows.length; i++) { // Start from 1 to skip header
+                        const row = tableRows[i];
+                        const textContent = row.textContent.toLowerCase();
+                        
+                        if (textContent.includes(searchValue)) {
+                            row.style.display = '';
+                            visibleCount++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+                    
+                    // Show a message when no results are found
+                    const existingMsg = document.getElementById('noResultsMessage');
+                    if (visibleCount === 0 && searchValue) {
+                        if (!existingMsg) {
+                            const msg = document.createElement('div');
+                            msg.id = 'noResultsMessage';
+                            msg.textContent = 'No matching results found';
+                            msg.style.padding = '10px';
+                            msg.style.color = '#666';
+                            msg.style.fontStyle = 'italic';
+                            msg.style.textAlign = 'center';
+                            const tableContainer = document.getElementById('snuCsvTable').parentElement;
+                            tableContainer.appendChild(msg);
+                        }
+                    } else if (existingMsg) {
+                        existingMsg.remove();
+                    }
+                });
+                
+                // Add expand columns button functionality
+                document.getElementById('csvExpandColumnsBtn').addEventListener('click', function() {
+                    const tableCells = document.querySelectorAll('#snuCsvTable th, #snuCsvTable td');
+                    const table = document.getElementById('snuCsvTable');
+                    const tableContainer = table.parentElement;
+                    const isExpanded = this.getAttribute('data-expanded') === 'true';
+                    
+                    if (isExpanded) {
+                        // Collapse columns
+                        table.style.tableLayout = 'fixed';
+                        tableCells.forEach(cell => {
+                            // Restore original widths
+                            const baseColumnWidth = cell.getAttribute('data-original-width');
+                            if (baseColumnWidth) {
+                                cell.style.maxWidth = baseColumnWidth;
+                                cell.style.minWidth = '80px';
+                            }
+                            cell.style.overflow = 'hidden';
+                            cell.style.textOverflow = 'ellipsis';
+                            cell.style.whiteSpace = 'nowrap';
+                        });
+                        // Ensure table respects container boundaries
+                        table.style.maxWidth = '100%';
+                        tableContainer.style.overflowX = 'auto';
+                        this.textContent = 'Expand Columns';
+                        this.setAttribute('data-expanded', 'false');
+                    } else {
+                        // Expand columns
+                        table.style.tableLayout = 'auto';
+                        tableCells.forEach(cell => {
+                            // Store original width for later restoration
+                            if (!cell.getAttribute('data-original-width')) {
+                                cell.setAttribute('data-original-width', cell.style.maxWidth);
+                            }
+                            cell.style.maxWidth = 'none';
+                            cell.style.overflow = 'visible';
+                            cell.style.whiteSpace = 'pre-wrap';
+                            cell.style.wordBreak = 'break-word';
+                        });
+                        // When expanded, ensure horizontal scrolling is enabled but table stays within viewport width
+                        tableContainer.style.overflowX = 'auto';
+                        table.style.maxWidth = 'none'; // Allow table to be wider than container for scrolling
+                        this.textContent = 'Collapse Columns';
+                        this.setAttribute('data-expanded', 'true');
+                    }
+                });
+                
+                // Add fit columns button functionality - auto-size columns to content
+                document.getElementById('csvFixColumnWidthsBtn').addEventListener('click', function() {
+                    const table = document.getElementById('snuCsvTable');
+                    const tableContainer = table.parentElement;
+                    const headerRow = table.querySelector('tr');
+                    const isExpanded = document.getElementById('csvExpandColumnsBtn').getAttribute('data-expanded') === 'true';
+                    
+                    // Only work in non-expanded mode
+                    if (isExpanded) {
+                        document.getElementById('csvExpandColumnsBtn').click();
+                    }
+                    
+                    // Auto-size columns
+                    table.style.tableLayout = 'auto';
+                    
+                    // After rendering, fix the width values
+                    setTimeout(() => {
+                        const headers = Array.from(headerRow.children);
+                        const containerWidth = tableContainer.clientWidth;
+                        const totalColumns = headers.length;
+                        
+                        // Calculate all widths first
+                        const widths = headers.map(th => th.offsetWidth);
+                        const totalWidth = widths.reduce((sum, width) => sum + width, 0);
+                        
+                        // If total width exceeds container, adjust proportionally
+                        if (totalWidth > containerWidth) {
+                            const ratio = containerWidth / totalWidth;
+                            widths.forEach((width, i) => {
+                                widths[i] = Math.floor(width * ratio);
+                            });
+                        }
+                        
+                        // Apply calculated widths
+                        headers.forEach((th, index) => {
+                            const width = widths[index];
+                            const columnCells = Array.from(table.querySelectorAll(`tr td:nth-child(${index + 1})`));
+                            
+                            // Set all cells in this column to the calculated width
+                            th.style.width = `${width}px`;
+                            columnCells.forEach(cell => {
+                                cell.style.width = `${width}px`;
+                            });
+                        });
+                        
+                        // Switch back to fixed layout
+                        table.style.tableLayout = 'fixed';
+                    }, 50);
+                });
+            }, 300);
+            
+        } catch (error) {
+            const errorDiv = document.createElement('div');
+            errorDiv.innerHTML = `<p>Error parsing CSV: ${error.message}</p>`;
+            errorDiv.style.color = 'red';
+            content.appendChild(errorDiv);
+            
+            // Fall back to text display
+            const pre = document.createElement('pre');
+            pre.textContent = fileContent;
+            pre.id = 'snuAttatchmentContentPre';
+            pre.style.overflow = 'auto';
+            pre.style.whiteSpace = 'pre-wrap';
+            pre.style.maxHeight = '94%';
+            content.appendChild(pre);
+        }
+    }
     else if (['txt', 'log', 'xml', 'json', 'html', 'css', 'js', 'sql', 'md', 'eml', 'ics'].includes(att.extension)) {
         const content = document.querySelector('#snuAttatchmentContent');
         content.innerHTML = 'File is being loaded, please wait...';
@@ -6368,7 +6786,7 @@ async function snuSetAttachmentPreview(att){
         content.innerHTML = '';
         const a = document.createElement('a');
         a.href = `/sys_attachment.do?sys_id=${att.sys_id}`;
-        a.textContent = `${att.file_name} Filetype not supportes, download attachment`;
+        a.textContent = `${att.file_name} Filetype not supported, download attachment`;
         a.style.display = 'block';
         content.appendChild(a);
     }
@@ -6397,7 +6815,7 @@ function snuAddPreviewAttachmentLinks(){
         let attSysId= attachment?.firstChild?.id?.replace('attachment_', '') || '';
         let pvw = document.createElement('a');
         pvw.innerHTML = "[⌕]&nbsp;";
-        pvw.title = "[SN Utils] Open Preview attachments modal (beta)";
+        pvw.title = "[SN Utils] Open Preview attachments modal";
         pvw.onclick = () => snuPreviewAttachmentsModal(attSysId);
         if (attachment.classList.contains('attachment_list_items')) 
             attachment.querySelector('span').appendChild(pvw);
