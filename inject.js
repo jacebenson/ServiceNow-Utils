@@ -680,6 +680,7 @@ function snuAddFilterListener() {
 }
 
 function snuSlashCommandAddListener() {
+    if (window !== window.top) return; //only from top, not in iframe   
     if (window.top.document.getElementById('snufilter') == null) return;
     if (window.top.document.getElementById('snufilter').classList.contains('snu-slashcommand')) return;
     window.top.document.getElementById('snufilter').classList.add('snu-slashcommand');
@@ -3657,7 +3658,7 @@ function snuSetShortCuts() {
             const hidedot = window.top.document.getElementById('cmdhidedot');
             hidedot?.addEventListener('click', evt => snuSlashCommandHide(false, evt));
             snufilter?.addEventListener('focus', function () { this.select(); });
-            snuSlashCommandAddListener();
+            setTimeout(snuSlashCommandAddListener, 100);
 
         } catch (e) {
             console.warn('Failed to inject SN Utils UI:', e);
@@ -4720,6 +4721,7 @@ function snuAddFieldSyncButtons() {
                         spnSync.style.cursor = 'pointer';
                         spnSync.style.marginLeft = '2px';
                         spnSync.dataset.field = elm; 
+                        spnSync.dataset.fieldtype = fieldType; 
                         spnSync.title = `[SN Utils] Send script to VS Code via sn-scriptsync`; 
                         spnSync.className = 'icon scriptSync icon-save';
                         spnSync.addEventListener('click', function() {

@@ -1,4 +1,9 @@
 # CHANGELOG.md
+## 9.0.0.2 (2025-05-28)
+Fixes / changes:
+  - Additional update for reliable initialisation of slash commands popup div (Issue #582)
+  - Fix for scriptsync button in the getBtns function, to work again (Issue #583)
+
 ## 9.0.0.0 (2025-05-28)
 Features:
   - SN Utils is 9 years old! 🎉 => Version 9.0.0.0
@@ -8,6 +13,8 @@ Fixes / changes:
   - Adding reminders and links to download custom slash commands to prevent data loss (email)
   - More reliable initialisation of slash commands popup div (Issue #582)
   - Some text adjustments, typo fixes.
+  - Adjustment to getBtns function to reduce html concatenation
+  - Implemented safeFetch method in scriptsync.js
 
 
 ## 8.2.8.0 (2025-04-24)
