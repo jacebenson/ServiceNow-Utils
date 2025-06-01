@@ -88,9 +88,10 @@ a.highlightlink {
 }
 
 div#content {
-    width: 794px;
+    width: 792px;
     padding: 2px;
     margin: 2px;
+    box-sizing: border-box;
 }
 
 div.tab-content {
@@ -226,11 +227,10 @@ table.dataTable tbody td {
     }
 }
 
-@media screen and (-webkit-min-device-pixel-ratio:0) and (min-resolution:.001dpcm) {
+@media screen (-webkit-min-device-pixel-ratio:0) and (min-resolution:.001dpcm) {
     .hide-in-chrome {
         display: none;
     }
-
     .show-in-chrome {
         display: inline;
     }
@@ -444,7 +444,7 @@ textarea:read-only {
 }
 
 #aboutlinkedin{
-    margin:30px 0 60px 0;
+    margin:30px 0 0 0;
 }
 
 .aboutlinkedina{
@@ -570,3 +570,360 @@ textarea:read-only {
     background-color: rgba(253, 253, 253, 0);
     background-blend-mode: soft-light;
 }
+
+/* Styles for chanegelog and issue template */
+.info-icon {
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 5px;
+    color: #666;
+    transition: color 0.2s;
+}
+
+.info-icon:hover {
+    color: #000;
+}
+
+/* === Card Styles (Changelog & Issue Template) === */
+#changelog {
+    font-size: 0.85em;
+    line-height: 1.4;
+    border: 1px solid #e2e8f0;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    padding: 1rem;
+    background: linear-gradient(to bottom, #ffffff, #f8fafc);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: relative;
+    max-height: 300px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+#changelog.expanded {
+    max-height: none;
+}
+
+#changelog::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: linear-gradient(to bottom, rgba(248, 250, 252, 0), rgba(248, 250, 252, 1));
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+#changelog.expanded::after {
+    opacity: 0;
+}
+
+#changelog .version {
+    margin-bottom: 1.25em;
+    padding-bottom: 0.75em;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+#changelog .version:last-child {
+    border-bottom: none;
+}
+
+#changelog .version-header {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 1.05em;
+    margin-bottom: 0.5em;
+    display: flex;
+    align-items: center;
+}
+
+#changelog .version-header::before {
+    content: '📦';
+    margin-right: 0.5em;
+    font-size: 1.1em;
+}
+
+#changelog .section {
+    margin-left: 1em;
+    margin-bottom: 0.5em;
+}
+
+#changelog .section-title {
+    font-weight: 600;
+    margin-top: 0.5em;
+    color: #2d3748;
+    display: flex;
+    align-items: center;
+}
+
+#changelog .section-title::before {
+    content: '🌟';
+    margin-right: 0.5em;
+    font-size: 1.1em;
+}
+
+#changelog .section.fixes .section-title::before {
+    content: '🛠️';
+}
+
+#changelog .section:nth-child(2) .section-title::before {
+    content: '✨';
+}
+
+#changelog .entry {
+    margin-left: 1em;
+    color: #4a5568;
+    position: relative;
+    padding-left: 0.75em;
+    margin-bottom: 0.25em;
+}
+
+#changelog .entry::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #718096;
+}
+
+#changelog .hidden {
+    display: none;
+}
+
+#show-more-changelog,
+#show-more-changelog * {
+  color: #22223b !important;
+  font-weight: 400 !important;
+}
+
+.about-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5em;
+    margin-top: 1em;
+}
+
+.about-title {
+    font-size: 2em;
+    font-weight: 700;
+    color: #22223b;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+}
+
+.about-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.9em;
+}
+
+.icon-inline {
+    width: 1.35em;
+    height: 1.35em;
+    vertical-align: middle;
+    opacity: 0.85;
+    transition: opacity 0.2s;
+}
+
+.about-meta a {
+    text-decoration: none;
+    color: #64748b;
+    transition: opacity 0.2s;
+}
+
+.about-meta a:hover .icon-inline {
+    opacity: 1;
+}
+
+.about-footer {
+    margin-top: 0.7em;
+    padding: 1em 1.5em;
+    background: #fff7ed;
+    border: 1px solid #fdba74;
+    border-radius: 6px;
+    color: #b45309;
+    font-size: 0.98em;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+}
+
+.about-footer .github-link {
+    color: #22223b;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.about-footer .github-link:hover {
+    text-decoration: underline;
+}
+
+.about-footer .icon-inline {
+    width: 1.1em;
+    height: 1.1em;
+    vertical-align: middle;
+    margin-right: 0.2em;
+}
+
+.about-footer .text-danger {
+    color: #e11d48;
+    font-weight: 600;
+}
+
+.changelog-toggle-btn {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f8fafc;
+    color: #22223b;
+    font-weight: 400;
+    font-size: 1em;
+    border: 1px solid #e2e8f0;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    margin-top: 0;
+    box-shadow: none;
+    padding: 0.7em 0;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    position: relative;
+    top: -8px;
+}
+
+.changelog-toggle-btn:hover {
+    background: #ffff;
+    color: #111827;
+}
+
+#changelog-toggle-arrow {
+    margin-left: 0.5em;
+    color: #64748b;
+    font-size: 1.1em;
+    transition: transform 0.2s, color 0.2s;
+}
+
+.changelog-toggle-btn:hover #changelog-toggle-arrow {
+    color: #22223b;
+}
+
+.badge-new {
+  background: #f59e42;
+  color: #fff;
+  font-size: 0.7em;
+  border-radius: 8px;
+  padding: 0.15em 0.6em;
+  margin-left: 0.5em;
+  vertical-align: middle;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.07);
+  animation: badge-pop 0.5s;
+}
+
+@keyframes badge-pop {
+  0% { transform: scale(0.7); opacity: 0; }
+  80% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* Modal overlay for issue template (improved) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 12px;
+  max-width: 900px;
+  width: 96vw;
+  box-shadow: 0 2px 32px rgba(0,0,0,0.18);
+  padding: 36px 32px 28px 32px;
+  position: relative;
+}
+
+.modal-header-main {
+  display: flex;
+  align-items: center;
+  gap: 1.2em;
+  margin-bottom: 0.5em;
+}
+
+.modal-title {
+  font-size: 1.35em;
+  font-weight: 700;
+  color: #22223b;
+  margin-right: 1em;
+}
+
+.copy-btn {
+  background: #f8fafc;
+  color: #22223b;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.35em 1.1em;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border 0.18s;
+  margin-left: 0.5em;
+}
+.copy-btn:hover {
+  background: #e2e8f0;
+  color: #111827;
+  border-color: #b6bbc6;
+}
+
+.modal-box pre, .modal-box code, #modal-issue-template-content {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 1em;
+  background: #f8fafc;
+  color: #22223b;
+  padding: 1.1em 1.2em;
+  border-radius: 6px;
+  margin-top: 1em;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: auto;
+}
+
+.modal-close {
+  position: absolute;
+  top: 2px;
+  right: 8px;
+  background: none !important;
+  border: none !important;
+  font-size: 1.5rem;
+  color: #22223b;
+  padding: 0;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1;
+  box-shadow: none;
+  transition: color 0.18s;
+}
+
+
+.modal-box {
+  padding-top: 16px;
+}
+/* End of Styles for chanegelog and issue template */
+

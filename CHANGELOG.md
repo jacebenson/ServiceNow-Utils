@@ -1,4 +1,15 @@
 # CHANGELOG.md
+## 9.1.0.0 (2025-06-01)
+Features:
+  - Showing changelog in the about tab of the popup (Issue #584)
+  - Show NEW badge on icon when extension updated
+  - Added setting to disable this NEW badge (default on).
+  - Added setting: Open a new browser tab for important SN Utils news and updates (default on).
+Fixes / changes:
+  - Another update for reliable initialisation of slash commands popup div (Issue #582 / Slack)
+  - Tighten rules in PULL_REQUEST_TEMPLATE.md
+
+
 ## 9.0.0.2 (2025-05-28)
 Fixes / changes:
   - Additional update for reliable initialisation of slash commands popup div (Issue #582)

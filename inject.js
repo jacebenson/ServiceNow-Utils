@@ -679,8 +679,8 @@ function snuAddFilterListener() {
     });
 }
 
-function snuSlashCommandAddListener() {
-    if (window !== window.top) return; //only from top, not in iframe   
+function snuSlashCommandAddListener(omitWindowTopCheck = false) {
+    if (window !== window.top && !omitWindowTopCheck) return; //only from top, not in iframe unless omitWindowTopCheck is true #582
     if (window.top.document.getElementById('snufilter') == null) return;
     if (window.top.document.getElementById('snufilter').classList.contains('snu-slashcommand')) return;
     window.top.document.getElementById('snufilter').classList.add('snu-slashcommand');
@@ -3658,7 +3658,7 @@ function snuSetShortCuts() {
             const hidedot = window.top.document.getElementById('cmdhidedot');
             hidedot?.addEventListener('click', evt => snuSlashCommandHide(false, evt));
             snufilter?.addEventListener('focus', function () { this.select(); });
-            setTimeout(snuSlashCommandAddListener, 100);
+            setTimeout(() => snuSlashCommandAddListener(false), 200);
 
         } catch (e) {
             console.warn('Failed to inject SN Utils UI:', e);
@@ -4317,6 +4317,7 @@ function snuSlashCommandHide(navFocus = false, evt) {
 }
 
 function snuSlashCommandShow(initialCommand, autoRun) {
+    snuSlashCommandAddListener(true);
     snuReceivedCommand = initialCommand;
     snuSlashNavigatorData = null; //force refreshing menu data
     snuSlashLogData = null; 

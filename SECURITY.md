@@ -6,7 +6,7 @@ To ensure the best security, always install and use the latest version of  SN Ut
 
 ## Reporting a Vulnerability
 
-If you discover a vulnerability, please report it by emailing us at [apps@arnoudkooi.com](mailto:apps@arnoudkooi.com) or by submitting a [Security Advisory](https://github.com/arnoudkooi/ServiceNow-Utils/security/advisories) on this repository.
+If you discover a vulnerability, please report it by emailing us at [apps@arnoudkooi.com](mailto:apps@arnoudkooi.com) or by submitting a [Security Advisory](https://github.com/arnoudkooi/SN-Utils/security/advisories) on this repository.
 
 ## Transparency
 

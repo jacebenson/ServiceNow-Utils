@@ -30,6 +30,192 @@ var sys_id;
 var isNoRecord = true;
 var tabIndex = -1;
 
+// Changelog functionality
+function initChangelog() {
+    // Get required elements
+    const changelogContent = document.getElementById('changelog-content');
+    const showMoreBtn = document.getElementById('show-more-changelog');
+    const badge = document.getElementById('changelog-badge');
+    let seenVersion = null;
+    let isExpanded = false;
+    let allEntries = [];
+
+    // Guard: Only proceed if all required elements exist
+    if (!changelogContent || !showMoreBtn || !badge) {
+        return;
+    }
+
+    // Parse markdown changelog into structured data
+    function parseChangelog(markdown) {
+        const entries = [];
+        let currentEntry = null;
+        let currentSection = null;
+        
+        const lines = markdown.split('\n');
+        
+        for (let line of lines) {
+            // Version header
+            if (line.startsWith('## ')) {
+                if (currentEntry) {
+                    entries.push(currentEntry);
+                }
+                const match = line.match(/## ([\d.]+) \(([\d-]+)\)/);
+                if (match) {
+                    currentEntry = {
+                        version: match[1],
+                        date: match[2],
+                        features: [],
+                        fixes: []
+                    };
+                    currentSection = null;
+                }
+            }
+            // Section header
+            else if (line.startsWith('Features:')) {
+                currentSection = 'features';
+            }
+            else if (line.startsWith('Fixes / changes:')) {
+                currentSection = 'fixes';
+            }
+            // Entry line
+            else if (line.trim().startsWith('- ') && currentEntry && currentSection) {
+                const content = line.trim().substring(2);
+                currentEntry[currentSection].push(content);
+            }
+        }
+        
+        // Add the last entry
+        if (currentEntry) {
+            entries.push(currentEntry);
+        }
+        
+        return entries;
+    }
+
+    // Render changelog entries
+    function renderChangelog(expanded = false) {
+        if (!allEntries.length) return;
+        
+        let html = '';
+        allEntries.forEach((entry, index) => {
+            if (!expanded && index >= 3) return;
+            
+            html += `<div class="version">
+                <div class="version-header">${entry.version} (${entry.date})</div>`;
+            
+            if (entry.features && entry.features.length) {
+                html += `<div class="section features">
+                    <div class="section-title">Features:</div>`;
+                entry.features.forEach(feature => {
+                    html += `<div class="entry">${feature}</div>`;
+                });
+                html += '</div>';
+            }
+            
+            if (entry.fixes && entry.fixes.length) {
+                html += `<div class="section fixes">
+                    <div class="section-title">Fixes / changes:</div>`;
+                entry.fixes.forEach(fix => {
+                    html += `<div class="entry">${fix}</div>`;
+                });
+                html += '</div>';
+            }
+            
+            html += '</div>';
+        });
+
+        if (!expanded) {
+            html += '<div class="version hidden">...</div>';
+        }
+
+        changelogContent.innerHTML = html;
+    }
+
+    // Initialize changelog
+    fetch('CHANGELOG.md')
+        .then(response => response.text())
+        .then(markdown => {
+            allEntries = parseChangelog(markdown);
+            renderChangelog();
+        })
+        .catch(error => {
+            console.error('Error loading changelog:', error);
+            changelogContent.innerHTML = '<div class="text-muted">Unable to load changelog</div>';
+            showMoreBtn.style.display = 'none';
+        });
+
+    chrome.storage.sync.get("changelog_seen_version", (data) => {
+        seenVersion = data.changelog_seen_version;
+        if (badge && seenVersion !== "disabled" && seenVersion !== chrome.runtime.getManifest().version) {
+            badge.style.display = "inline-block";
+            badge.onclick = function() {
+                badge.style.display = "none";
+                markChangelogSeen();
+                showChangelogToast('Changelog marked as seen. The badge will reappear for future updates.');
+            };
+        } else if (badge) {
+            badge.style.display = "none";
+        }
+    });
+
+    function markChangelogSeen() {
+        if (chrome && chrome.runtime && chrome.runtime.sendMessage) {
+            chrome.runtime.sendMessage("changelog_seen");
+        }
+        chrome.storage.sync.set({ changelog_seen_version: chrome.runtime.getManifest().version });
+    }
+
+    // Toggle expanded view
+    showMoreBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        isExpanded = !isExpanded;
+        document.getElementById('changelog').classList.toggle('expanded', isExpanded);
+        renderChangelog(isExpanded);
+        document.getElementById('changelog-toggle-text').textContent = isExpanded ? 'Show less' : 'Show more changes';
+        document.getElementById('changelog-toggle-arrow').style.transform = isExpanded ? 'rotate(180deg)' : 'none';
+        // Hide badge and mark as seen when expanding
+        if (isExpanded && badge) {
+            badge.style.display = "none";
+            markChangelogSeen();
+        }
+    });
+}
+
+function setupChangelogBadgeToggle() {
+    const toggle = document.getElementById('toggle-changelog-badge');
+    const badge = document.getElementById('changelog-badge');
+    if (!toggle || !badge) return;
+    // Set initial state: checked if not disabled
+    chrome.storage.sync.get("changelog_seen_version", (data) => {
+        toggle.checked = data.changelog_seen_version !== "disabled";
+        // Also show/hide the badge icon immediately
+        if (toggle.checked) {
+            if (badge.style.display === "none" && (!data.changelog_seen_version || data.changelog_seen_version !== latestVersion)) {
+                badge.style.display = "inline-block";
+            }
+        } else {
+            badge.style.display = "none";
+        }
+    });
+    toggle.addEventListener('change', function() {
+        if (toggle.checked) {
+            // Enable badge: clear the value so badge logic works as normal
+            chrome.storage.sync.remove("changelog_seen_version", () => {
+                initChangelog();
+                badge.style.display = "inline-block";
+                chrome.runtime.sendMessage({ event: "updateBadge" });
+            });
+        } else {
+            // Disable badge: set to 'disabled'
+            chrome.storage.sync.set({ changelog_seen_version: "disabled" }, () => {
+                initChangelog();
+                badge.style.display = "none";
+                chrome.runtime.sendMessage({ event: "updateBadge" });
+            });
+        }
+    });
+}
+
 const airportCodes = {
     "ams": { "city": "Amsterdam", "country": "Netherlands", "region": "Europe" },
     "bne": { "city": "Brisbane", "country": "Australia", "region": "Oceania" },
@@ -64,12 +250,32 @@ document.addEventListener('DOMContentLoaded', function () {
         getBrowserVariables(tabid,cookieStoreId);
         document.querySelector("#snuVersion").innerText = chrome.runtime.getManifest().version;
         //document.querySelector('#leavereview').style.display = 'none';
-
     });
 
-     if(navigator.userAgent.match(/firefox/i)) $('input[type="color"]').attr('type','text') //bug in FireFox to use html5 color tag in popup
+    if(navigator.userAgent.match(/firefox/i)) $('input[type="color"]').attr('type','text') //bug in FireFox to use html5 color tag in popup
 
     clearInvalidatedLocalStorageCache();
+    initChangelog(); // Initialize changelog functionality
+    setupChangelogBadgeToggle(); // Add badge toggle logic
+
+    // Add notification div for toasts
+    if (!document.getElementById('changelog-toast')) {
+        const toast = document.createElement('div');
+        toast.id = 'changelog-toast';
+        toast.style.position = 'fixed';
+        toast.style.bottom = '24px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.background = '#22223b';
+        toast.style.color = '#fff';
+        toast.style.padding = '10px 22px';
+        toast.style.borderRadius = '8px';
+        toast.style.fontSize = '1em';
+        toast.style.boxShadow = '0 2px 12px rgba(0,0,0,0.12)';
+        toast.style.display = 'none';
+        toast.style.zIndex = '99999';
+        document.body.appendChild(toast);
+    }
 
     //document.querySelector('#reqPermission').addEventListener("click", requestPermissionsForCurrentSite);
 });
@@ -2028,4 +2234,117 @@ function requestPermissionsForCurrentSite() {
             });
         }
     });
+}
+
+async function getStatsDoInfo() {
+    try {
+        const res = await fetch(url + '/stats.do');
+        const text = await res.text();
+        const match = text.match(/Build tag:\s*(.+?)</i);
+        return match ? match[1].trim() : 'Unknown';
+    } catch {
+        return 'Unavailable';
+    }
+}
+
+const infoIcon = document.getElementById('issue-template-icon');
+const modal = document.getElementById('issue-template-modal');
+const modalClose = document.getElementById('close-issue-template-modal');
+const modalCopy = document.getElementById('modal-copy-issue-template');
+const modalContent = document.getElementById('modal-issue-template-content');
+
+function showIssueTemplateModal() {
+  modal.style.display = 'flex';
+  buildIssueTemplate().then(template => {
+    modalContent.textContent = template;
+  });
+}
+function hideIssueTemplateModal() {
+  modal.style.display = 'none';
+  modalContent.textContent = '';
+}
+if (infoIcon && modal) {
+  infoIcon.addEventListener('click', showIssueTemplateModal);
+}
+if (modalClose) {
+  modalClose.addEventListener('click', hideIssueTemplateModal);
+}
+if (modal) {
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) hideIssueTemplateModal();
+  });
+}
+if (modalCopy && modalContent) {
+  modalCopy.addEventListener('click', function() {
+    const text = modalContent.textContent.trim();
+    navigator.clipboard.writeText(text).then(() => {
+      modalCopy.textContent = 'Copied!';
+      setTimeout(() => { modalCopy.textContent = 'Copy'; }, 1200);
+    });
+  });
+}
+// Update buildIssueTemplate to return the template string
+async function buildIssueTemplate() {
+  const ua = navigator.userAgent;
+  const browser = ua.includes('Chrome') ? 'Chrome' : 'Other';
+  const extensionVersion = chrome.runtime.getManifest().short_name + " - " + chrome.runtime.getManifest().version;
+  const snVersion = await getStatsDoInfo();
+  return `### Description\n<!-- Clearly describe the issue, include steps to reproduce and screenshots if possible -->\n\n### Environment details\n- **User agent:** ${browser} (${ua})\n- **SN Utils Extension Version:** ${extensionVersion}\n- **ServiceNow Version:** ${snVersion}`;
+}
+
+setTimeout(() => {
+  const infoIcon = document.getElementById('issue-template-icon');
+  const modal = document.getElementById('issue-template-modal');
+  const modalClose = document.getElementById('close-issue-template-modal');
+  const modalCopy = document.getElementById('modal-copy-issue-template');
+  const modalContent = document.getElementById('modal-issue-template-content');
+
+  function showIssueTemplateModal() {
+    modal.style.display = 'flex';
+    buildIssueTemplate().then(template => {
+      modalContent.textContent = template;
+    });
+  }
+  function hideIssueTemplateModal() {
+    modal.style.display = 'none';
+    modalContent.textContent = '';
+  }
+  if (infoIcon && modal) {
+    infoIcon.addEventListener('click', showIssueTemplateModal);
+  }
+  if (modalClose) {
+    modalClose.addEventListener('click', hideIssueTemplateModal);
+  }
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) hideIssueTemplateModal();
+    });
+  }
+  if (modalCopy && modalContent) {
+    modalCopy.addEventListener('click', function() {
+      const text = modalContent.textContent.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        modalCopy.textContent = 'Copied!';
+        setTimeout(() => { modalCopy.textContent = 'Copy'; }, 1200);
+      });
+    });
+  }
+},1000);
+
+// Update buildIssueTemplate to return the template string
+async function buildIssueTemplate() {
+  const ua = navigator.userAgent;
+  const browser = ua.includes('Chrome') ? 'Chrome' : 'Other';
+  const extensionVersion = chrome.runtime.getManifest().short_name + " - " + chrome.runtime.getManifest().version;
+  const snVersion = await getStatsDoInfo();
+  return `### Description\n<!-- Clearly describe the issue, include steps to reproduce and screenshots if possible -->\n\n### Environment details\n- **User agent:** ${browser} (${ua})\n- **SN Utils Extension Version:** ${extensionVersion}\n- **ServiceNow Version:** ${snVersion}`;
+}
+
+// Utility to show a toast message
+function showChangelogToast(msg) {
+    const toast = document.getElementById('changelog-toast');
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 6000);
 }

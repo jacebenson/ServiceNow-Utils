@@ -30,6 +30,38 @@ if (!chrome.contextMenus) chrome.contextMenus = browser.menus; //safari compatib
 
 chrome.contextMenus.removeAll(initializeContextMenus);
 
+
+// Set badge if user hasn't seen latest version
+function updateBadge() {
+  chrome.storage.sync.get("changelog_seen_version", (data) => {
+    if (
+      data.changelog_seen_version === "disabled" ||
+      data.changelog_seen_version === chrome.runtime.getManifest().version
+    ) {
+      chrome.action.setBadgeText({ text: "" });
+    } else {
+      chrome.action.setBadgeText({ text: "NEW" });
+      chrome.action.setBadgeBackgroundColor({ color: "#f59e42" });
+    }
+  });
+}
+
+// On install/update or browser start
+chrome.runtime.onInstalled.addListener(updateBadge);
+chrome.runtime.onStartup.addListener(updateBadge);
+
+// Listen for message from popup to clear badge
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg === "changelog_seen") {
+    chrome.action.setBadgeText({ text: "" });
+    chrome.storage.sync.set({ changelog_seen_version: chrome.runtime.getManifest().version });
+  }
+  // Allow popup to request badge update
+  if (msg && msg.event === "updateBadge") {
+    updateBadge();
+  }
+});
+
 //Attach eventlistener, setting extension only active on matching urls
 chrome.runtime.onInstalled.addListener(function (details) {
     // firefox uses manifest pageAction.show_matches for the same functionality
