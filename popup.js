@@ -164,8 +164,13 @@ function initChangelog() {
     }
 
     // Initialize changelog
-    fetch('CHANGELOG.md')
-        .then(response => response.text())
+    fetch(chrome.runtime.getURL('CHANGELOG.md'))
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text();
+        })
         .then(markdown => {
             allEntries = parseChangelog(markdown);
             renderChangelog();
@@ -173,8 +178,7 @@ function initChangelog() {
         .catch(error => {
             console.error('Error loading changelog:', error);
             const errorDiv = document.createElement('div');
-            errorDiv.className = 'text-muted';
-            errorDiv.textContent = 'Unable to load changelog';
+            errorDiv.innerHTML = 'Unable to load changelog. <a href="https://github.com/arnoudkooi/SN-Utils/blob/master/CHANGELOG.md" target="_blank">View on GitHub</a><br><br>';
             changelogContent.textContent = '';
             changelogContent.appendChild(errorDiv);
             showMoreBtn.style.display = 'none';

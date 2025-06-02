@@ -102,7 +102,8 @@
         "inject_next.js",
         "inject_parent.js",
         "css/*",
-        "js/*"
+        "js/*",
+        "CHANGELOG.md"
       ],
       "matches": [
         "https://*.service-now.com/*",

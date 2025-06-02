@@ -134,7 +134,8 @@
         "inject_next.js",
         "inject_parent.js",
         "css/*",
-        "js/*"
+        "js/*",
+        "CHANGELOG.md"
     ],
     "manifest_version": 2,
     "applications": {
