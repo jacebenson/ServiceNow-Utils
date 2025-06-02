@@ -30,20 +30,47 @@ if (!chrome.contextMenus) chrome.contextMenus = browser.menus; //safari compatib
 
 chrome.contextMenus.removeAll(initializeContextMenus);
 
+// Add version comparison function
+function isSignificantVersionChange(oldVersion, newVersion) {
+    if (!oldVersion || oldVersion === "disabled") return true;
+    
+    const oldParts = oldVersion.split('.').map(Number);
+    const newParts = newVersion.split('.').map(Number);
+    
+    // Ensure both versions have at least 3 parts (major.minor.patch)
+    if (oldParts.length < 3 || newParts.length < 3) {
+        return true; // If version format is invalid, show the badge to be safe
+    }
+    
+    // Compare major, minor, and patch versions (first three numbers)
+    for (let i = 0; i < 3; i++) {
+        if (newParts[i] > oldParts[i]) return true;
+        if (newParts[i] < oldParts[i]) return false;
+    }
+    
+    // If we get here, the first three numbers are the same
+    // Only show badge if the build number (fourth number) changes by more than 4
+    // If either version doesn't have a build number, treat it as 0
+    const oldBuild = oldParts[3] || 0;
+    const newBuild = newParts[3] || 0;
+    return Math.abs(newBuild - oldBuild) > 4;
+}
 
 // Set badge if user hasn't seen latest version
 function updateBadge() {
-  chrome.storage.sync.get("changelog_seen_version", (data) => {
-    if (
-      data.changelog_seen_version === "disabled" ||
-      data.changelog_seen_version === chrome.runtime.getManifest().version
-    ) {
-      chrome.action.setBadgeText({ text: "" });
-    } else {
-      chrome.action.setBadgeText({ text: "NEW" });
-      chrome.action.setBadgeBackgroundColor({ color: "#f59e42" });
-    }
-  });
+    chrome.storage.sync.get("changelog_seen_version", (data) => {
+        const currentVersion = chrome.runtime.getManifest().version;
+        
+        if (
+            data.changelog_seen_version === "disabled" ||
+            !isSignificantVersionChange(data.changelog_seen_version, currentVersion)
+        ) {
+            chrome.action.setBadgeText({ text: "" });
+        } else {
+            chrome.action.setBadgeText({ text: "NEW" });
+            chrome.action.setBadgeBackgroundColor({ color: "#f59e42" });
+        }
+    });
 }
 
 // On install/update or browser start

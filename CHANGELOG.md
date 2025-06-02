@@ -1,5 +1,5 @@
 # CHANGELOG.md
-## 9.1.0.0 (2025-06-01)
+## 9.1.0.1 (2025-06-01)
 Features:
   - Showing changelog in the about tab of the popup (Issue #584)
   - Show NEW badge on icon when extension updated
@@ -8,6 +8,7 @@ Features:
 Fixes / changes:
   - Another update for reliable initialisation of slash commands popup div (Issue #582 / Slack)
   - Tighten rules in PULL_REQUEST_TEMPLATE.md
+  - Changed rendering of changelog and badge function (9.1.0.0 => 9.1.0.1 Slack) 
 
 
 ## 9.0.0.2 (2025-05-28)

@@ -96,39 +96,71 @@ function initChangelog() {
     function renderChangelog(expanded = false) {
         if (!allEntries.length) return;
         
-        let html = '';
+        // Clear existing content
+        changelogContent.textContent = '';
+        
         allEntries.forEach((entry, index) => {
             if (!expanded && index >= 3) return;
             
-            html += `<div class="version">
-                <div class="version-header">${entry.version} (${entry.date})</div>`;
+            // Create version container
+            const versionDiv = document.createElement('div');
+            versionDiv.className = 'version';
             
+            // Create version header
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'version-header';
+            headerDiv.textContent = `${entry.version} (${entry.date})`;
+            versionDiv.appendChild(headerDiv);
+            
+            // Add features section if exists
             if (entry.features && entry.features.length) {
-                html += `<div class="section features">
-                    <div class="section-title">Features:</div>`;
+                const featuresDiv = document.createElement('div');
+                featuresDiv.className = 'section features';
+                
+                const featuresTitle = document.createElement('div');
+                featuresTitle.className = 'section-title';
+                featuresTitle.textContent = 'Features:';
+                featuresDiv.appendChild(featuresTitle);
+                
                 entry.features.forEach(feature => {
-                    html += `<div class="entry">${feature}</div>`;
+                    const featureDiv = document.createElement('div');
+                    featureDiv.className = 'entry';
+                    featureDiv.textContent = feature;
+                    featuresDiv.appendChild(featureDiv);
                 });
-                html += '</div>';
+                
+                versionDiv.appendChild(featuresDiv);
             }
             
+            // Add fixes section if exists
             if (entry.fixes && entry.fixes.length) {
-                html += `<div class="section fixes">
-                    <div class="section-title">Fixes / changes:</div>`;
+                const fixesDiv = document.createElement('div');
+                fixesDiv.className = 'section fixes';
+                
+                const fixesTitle = document.createElement('div');
+                fixesTitle.className = 'section-title';
+                fixesTitle.textContent = 'Fixes / changes:';
+                fixesDiv.appendChild(fixesTitle);
+                
                 entry.fixes.forEach(fix => {
-                    html += `<div class="entry">${fix}</div>`;
+                    const fixDiv = document.createElement('div');
+                    fixDiv.className = 'entry';
+                    fixDiv.textContent = fix;
+                    fixesDiv.appendChild(fixDiv);
                 });
-                html += '</div>';
+                
+                versionDiv.appendChild(fixesDiv);
             }
             
-            html += '</div>';
+            changelogContent.appendChild(versionDiv);
         });
 
         if (!expanded) {
-            html += '<div class="version hidden">...</div>';
+            const hiddenDiv = document.createElement('div');
+            hiddenDiv.className = 'version hidden';
+            hiddenDiv.textContent = '...';
+            changelogContent.appendChild(hiddenDiv);
         }
-
-        changelogContent.innerHTML = html;
     }
 
     // Initialize changelog
@@ -140,13 +172,46 @@ function initChangelog() {
         })
         .catch(error => {
             console.error('Error loading changelog:', error);
-            changelogContent.innerHTML = '<div class="text-muted">Unable to load changelog</div>';
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'text-muted';
+            errorDiv.textContent = 'Unable to load changelog';
+            changelogContent.textContent = '';
+            changelogContent.appendChild(errorDiv);
             showMoreBtn.style.display = 'none';
         });
 
+    // Add version comparison function
+    function isSignificantVersionChange(oldVersion, newVersion) {
+        if (!oldVersion || oldVersion === "disabled") return true;
+        
+        const oldParts = oldVersion.split('.').map(Number);
+        const newParts = newVersion.split('.').map(Number);
+        
+        // Ensure both versions have at least 3 parts (major.minor.patch)
+        if (oldParts.length < 3 || newParts.length < 3) {
+            return true; // If version format is invalid, show the badge to be safe
+        }
+        
+        // Compare major, minor, and patch versions (first three numbers)
+        for (let i = 0; i < 3; i++) {
+            if (newParts[i] > oldParts[i]) return true;
+            if (newParts[i] < oldParts[i]) return false;
+        }
+        
+        // If we get here, the first three numbers are the same
+        // Only show badge if the build number (fourth number) changes by more than 4
+        // If either version doesn't have a build number, treat it as 0
+        const oldBuild = oldParts[3] || 0;
+        const newBuild = newParts[3] || 0;
+        return Math.abs(newBuild - oldBuild) > 4;
+    }
+
+    // Modify the changelog badge check
     chrome.storage.sync.get("changelog_seen_version", (data) => {
         seenVersion = data.changelog_seen_version;
-        if (badge && seenVersion !== "disabled" && seenVersion !== chrome.runtime.getManifest().version) {
+        const currentVersion = chrome.runtime.getManifest().version;
+        
+        if (badge && seenVersion !== "disabled" && isSignificantVersionChange(seenVersion, currentVersion)) {
             badge.style.display = "inline-block";
             badge.onclick = function() {
                 badge.style.display = "none";
@@ -257,25 +322,6 @@ document.addEventListener('DOMContentLoaded', function () {
     clearInvalidatedLocalStorageCache();
     initChangelog(); // Initialize changelog functionality
     setupChangelogBadgeToggle(); // Add badge toggle logic
-
-    // Add notification div for toasts
-    if (!document.getElementById('changelog-toast')) {
-        const toast = document.createElement('div');
-        toast.id = 'changelog-toast';
-        toast.style.position = 'fixed';
-        toast.style.bottom = '24px';
-        toast.style.left = '50%';
-        toast.style.transform = 'translateX(-50%)';
-        toast.style.background = '#22223b';
-        toast.style.color = '#fff';
-        toast.style.padding = '10px 22px';
-        toast.style.borderRadius = '8px';
-        toast.style.fontSize = '1em';
-        toast.style.boxShadow = '0 2px 12px rgba(0,0,0,0.12)';
-        toast.style.display = 'none';
-        toast.style.zIndex = '99999';
-        document.body.appendChild(toast);
-    }
 
     //document.querySelector('#reqPermission').addEventListener("click", requestPermissionsForCurrentSite);
 });
@@ -567,7 +613,11 @@ async function prepareJsonNodes() {
     const dbUrlValueEl = document.getElementById('dbUrlValue');
     const dbSessionValueEl = document.getElementById('dbSessionValue');
 
-    if(dbNameValueEl) dbNameValueEl.innerHTML = dbMeta.dbName ?? 'N/A';
+    if(dbNameValueEl) {
+        const dbNameText = document.createTextNode(dbMeta.dbName ?? 'N/A');
+        dbNameValueEl.textContent = '';
+        dbNameValueEl.appendChild(dbNameText);
+    }
     if(dbUrlValueEl) dbUrlValueEl.textContent = dbMeta.dbUrl ?? 'N/A';
     if(dbSessionValueEl) dbSessionValueEl.textContent = dbMeta.sessionId ?? 'N/A';    
 
@@ -1405,7 +1455,13 @@ function setDataTableNodes(nme, node) {
 
     $('a.setnode').click(function (ev) {
 
-        ev.currentTarget.innerHTML = "<i class='fas fa-spinner fa-spin' style='color:blue !important;'></i> Switching..."; 
+        ev.currentTarget.textContent = '';
+        const spinner = document.createElement('i');
+        spinner.className = 'fas fa-spinner fa-spin';
+        spinner.style.color = 'blue';
+        spinner.style.important = true;
+        ev.currentTarget.appendChild(spinner);
+        ev.currentTarget.appendChild(document.createTextNode(' Switching...'));
         ev.currentTarget.style.color = "blue";
         console.log(ev);
         var node = {"nodeId" : this.id, "nodeName" : $(this).attr('data-node') };
