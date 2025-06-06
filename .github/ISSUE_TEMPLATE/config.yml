@@ -1,5 +1,5 @@
-blank_issues_enabled: false
+blank_issues_enabled: true
 contact_links:
-  - name: 🐞 Report a Bug (after reading the guidelines)
-    url: https://github.com/arnoudkooi/snutils/blob/main/.github/template.md
-    about: Please read the reporting guidelines first to ensure you include the environment details.
+  - name: 🐞 Instructions to include environment details
+    url: https://github.com/arnoudkooi/SN-Utils/blob/master/.github/template.md
+    about: Please read the instruction to ensure you include the environment details.
