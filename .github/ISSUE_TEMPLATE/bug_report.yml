@@ -1,6 +1,5 @@
 name: Bug Report
 description: Report a bug in SN Utils
-title: ""
 body:
   - type: markdown
     attributes:
