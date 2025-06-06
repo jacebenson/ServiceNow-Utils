@@ -1,13 +1,12 @@
 name: Bug Report
 description: Report a bug in SN Utils
-title: "[Bug] "
-labels: [bug]
+title: ""
 body:
   - type: markdown
     attributes:
       value: |
         Please paste the information copied from the SN Utils popup below.  
-        Make sure to include a clear description and steps to reproduce.
+        Make sure to include a clear description and steps to reproduce. [See instruction](/arnoudkooi/SN-Utils/blob/master/.github/template.md)
 
   - type: textarea
     id: report
