@@ -1,5 +1,10 @@
 # CHANGELOG.md
 
+## 9.1.0.6 (2025-06-16)
+Fixes / changes:
+  - Fix double opening Monaco editor (Issue #589)
+  - In The widget editor, the sn-scriptsync button now shows, even when the widget is in a diffrent scope, as sn-scriptsync does not depend on the selected scope. Besides the button is now placed after the normal save button.
+
 ## 9.1.0.4 (2025-06-01)
 Features:
   - Showing changelog in the about tab of the popup (Issue #584)

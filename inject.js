@@ -4725,9 +4725,7 @@ function snuAddFieldSyncButtons() {
                         spnSync.dataset.fieldtype = fieldType; 
                         spnSync.title = `[SN Utils] Send script to VS Code via sn-scriptsync`; 
                         spnSync.className = 'icon scriptSync icon-save';
-                        spnSync.addEventListener('click', function() {
-                            snuPostToScriptSync(this.dataset.field, this.dataset.fieldtype);
-                        });
+
                         fragment.appendChild(spnSync);
                     }
 
@@ -4740,10 +4738,6 @@ function snuAddFieldSyncButtons() {
                         spnMonaco.dataset.fieldtype = fieldType; 
                         spnMonaco.title = `[SN Utils] Send script to Monaco editor in a new tab`; 
                         spnMonaco.className = 'icon scriptSync icon-code';
-                        spnMonaco.addEventListener('click', function() {
-                            snuPostToMonaco(this.dataset.field, this.dataset.fieldtype);
-                        });
-
                         fragment.appendChild(spnMonaco);
                     }
                     
@@ -4759,10 +4753,23 @@ function snuAddFieldSyncButtons() {
         $rootScope.$watch("loadingIndicator", function (newValue, oldValue) {
             if (!newValue) {
                 setTimeout(function () {
-                    $('#vscode-btn').remove()
-                    let btn = `<button id='vscode-btn' class="btn btn-info btn-group" onclick="snuPostRequestToScriptSync('widget')" title="Edit widget in VS Code (SN ScriptSync)">
-                    <span class="glyphicon glyphicon-floppy-save"></span></button>`;
-                    if (!$('#vscode-btn').length) $('button[type=submit]').before(btn);
+                    const existingBtn = document.getElementById('vscode-btn');
+                    if (existingBtn) existingBtn.remove();
+                    
+                    const btn = document.createElement('button');
+                    btn.id = 'vscode-btn';
+                    btn.className = 'btn btn-info btn-group';
+                    btn.title = 'Edit widget in VS Code (SN ScriptSync)';
+                    btn.innerHTML = `<span class="glyphicon glyphicon-floppy-save"></span>`;
+                    btn.onclick = function() {
+                        snuPostRequestToScriptSync('widget');
+                    };
+
+                    const btnGroups = document.querySelectorAll('.btn-group');
+                    if (btnGroups.length > 0) {
+                    const lastBtnGroup = btnGroups[btnGroups.length - 1];
+                    lastBtnGroup.parentNode.insertBefore(btn, lastBtnGroup);
+                    }
                 }, 500);
             }
         });
