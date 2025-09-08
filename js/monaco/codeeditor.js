@@ -30,6 +30,68 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
                 allowNonTsExtensions: true
             });
 
+            // Configure TypeScript language service with custom formatting options
+            // Since Monaco Editor doesn't expose insertSpaceBeforeFunctionParenthesis,
+            // we register a format provider that removes spaces before function parentheses
+            
+            // Document formatting provider (handles Format Document command)
+            monaco.languages.registerDocumentFormattingEditProvider('javascript', {
+                provideDocumentFormattingEdits: function(model, options, token) {
+                    const text = model.getValue();
+                    const formattedText = text.replace(/(\w)\s+\(/g, '$1(');
+                    
+                    if (text !== formattedText) {
+                        return [{
+                            range: model.getFullModelRange(),
+                            text: formattedText
+                        }];
+                    }
+                    return [];
+                }
+            });
+
+            // Range formatting provider (handles Format Selection command)
+            monaco.languages.registerDocumentRangeFormattingEditProvider('javascript', {
+                provideDocumentRangeFormattingEdits: function(model, range, options, token) {
+                    const text = model.getValueInRange(range);
+                    const formattedText = text.replace(/(\w)\s+\(/g, '$1(');
+                    
+                    if (text !== formattedText) {
+                        return [{
+                            range: range,
+                            text: formattedText
+                        }];
+                    }
+                    return [];
+                }
+            });
+
+            monaco.languages.registerOnTypeFormattingEditProvider('javascript', {
+                autoFormatTriggerCharacters: ['('],
+                provideOnTypeFormattingEdits: function(model, position, ch, options, token) {
+                    if (ch === '(') {
+                        const line = model.getLineContent(position.lineNumber);
+                        const beforeParen = line.substring(0, position.column - 1);
+                        
+                        // Check if there's a space before the parenthesis
+                        if (beforeParen.match(/\w\s+$/)) {
+                            const range = {
+                                startLineNumber: position.lineNumber,
+                                startColumn: position.column - 2,  // Position of the space
+                                endLineNumber: position.lineNumber,
+                                endColumn: position.column - 1     // Position just before the parenthesis
+                            };
+                            
+                            return [{
+                                range: range,
+                                text: ''  // Remove the space
+                            }];
+                        }
+                    }
+                    return [];
+                }
+            });
+
             monaco.languages.registerColorProvider('json', {
                 provideColorPresentations: (model, colorInfo) => {
                     var color = colorInfo.color;
@@ -361,7 +423,9 @@ function changeToEditor(editorContent) {
         language: language,
         theme: theme,
         colorDecorators: true,
-        "bracketPairColorization.enabled": true
+        "bracketPairColorization.enabled": true,
+        formatOnType: true,
+        formatOnPaste: true
     });
 
     addActions(editor);

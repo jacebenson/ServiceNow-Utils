@@ -1,5 +1,14 @@
 # CHANGELOG.md
 
+## 9.1.1.0 (2025-09-08)
+Fixes / changes:
+  - Sanitize Codesearch query text for regex (PR #586)
+  - Update table / sysId resolve in Workflow Studio / ServiceNow studio
+  - Exclude currency fields setvalue (Issue #597)
+  - Changed [component-id] to [macroponent-namespace] (Issue #600)
+  - Prevent space before function in Monaco editor when formatting (Issue #605)
+  - Updated the /UIBE command (Issue #607)
+
 ## 9.1.0.6 (2025-06-16)
 Fixes / changes:
   - Fix double opening Monaco editor (Issue #589)

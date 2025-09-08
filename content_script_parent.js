@@ -107,9 +107,9 @@ function getFrameHref() {
     var frameHref = document.location.href;
     if (document.querySelectorAll('#gsft_main').length) //ui16
         frameHref = document.getElementById("gsft_main").contentWindow.location.href;
-    else if (document.querySelectorAll("[component-id]").length && //polaris ui
-             document.querySelector("[component-id]").shadowRoot.querySelectorAll("#gsft_main").length) {
-        frameHref = document.querySelector("[component-id]").shadowRoot.querySelector("#gsft_main").contentWindow.location.href;  
+    else if (document.querySelectorAll("[macroponent-namespace]").length && //polaris ui
+             document.querySelector("[macroponent-namespace]").shadowRoot.querySelectorAll("#gsft_main").length) {
+        frameHref = document.querySelector("[macroponent-namespace]").shadowRoot.querySelector("#gsft_main").contentWindow.location.href;  
     }
     else if (document.querySelectorAll('div.tab-pane.active').length == 1) { //studio
         try{
@@ -174,9 +174,9 @@ function getVars(varstring) {
     var ret = {};
     if (document.querySelectorAll('#gsft_main').length) //ui16
         doc = document.querySelector('#gsft_main').contentWindow.document;
-    else if (document.querySelectorAll("[component-id]").length && //polaris ui
-             document.querySelector("[component-id]").shadowRoot.querySelectorAll("#gsft_main").length) {
-        doc = document.querySelector("[component-id]").shadowRoot.querySelector("#gsft_main").contentWindow.document;  
+    else if (document.querySelectorAll("[macroponent-namespace]").length && //polaris ui
+             document.querySelector("[macroponent-namespace]").shadowRoot.querySelectorAll("#gsft_main").length) {
+        doc = document.querySelector("[macroponent-namespace]").shadowRoot.querySelector("#gsft_main").contentWindow.document;  
     }
     else if (document.querySelectorAll('div.tab-pane.active').length == 1) { //studio
         try{

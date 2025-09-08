@@ -259,7 +259,7 @@ function setupChangelogBadgeToggle() {
         toggle.checked = data.changelog_seen_version !== "disabled";
         // Also show/hide the badge icon immediately
         if (toggle.checked) {
-            if (badge.style.display === "none" && (!data.changelog_seen_version || data.changelog_seen_version !== latestVersion)) {
+            if (badge.style.display === "none" && (!data.changelog_seen_version || data.changelog_seen_version !== chrome.runtime.getManifest().version)) {
                 badge.style.display = "inline-block";
             }
         } else {

@@ -122,7 +122,9 @@ class SnuNextManager {
                         }
                     });
                     let val = frm.nowRecordFormBlob.gForm.getValue(elm.name);
-                    frm.nowRecordFormBlob.gForm.setValue(elm.name, val) //refresh dispalyvalue
+                    if(elm?.dictionary?.type !== 'currency') { //#597
+                        frm.nowRecordFormBlob.gForm.setValue(elm.name, val) //refresh dispalyvalue
+                    }
                 }
             }));
 

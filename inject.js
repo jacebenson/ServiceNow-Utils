@@ -323,8 +323,8 @@ var snuslashcommands = {
     "uibe": {
         "url": "/sys_ux_page_registry_list.do?sysparm_query=root_macroponentISNOTEMPTY^sys_id!=3bfb334573021010e12d1e3014f6a7a9^sys_id!=8f30c79577af00108a370870a810613a^sys_id!=a36cd3837721201079ccdc3f581061b8^sys_id!=ec71a07477a2301079ccdc3f581061e9^titleLIKE$0^ORpathLIKE$0^ORDERBYDESCsys_updated_on",
         "hint": "UIB Experience <search>",
-        "fields": "title,path,admin_panel.sys_id",
-        "overwriteurl": "/now/build/ui/apps/$admin_panel.sys_id"
+        "fields": "title,path,sys_id",
+        "overwriteurl": "/now/builder/ui/experience/$sys_id"
     },
     "uibo": {
         "url": "javascript: !function(){let e=(e,a,n)=>{if(parseInt(ux_globals?.libuxf?.version.split(\".\")[0])>22){var t=`/now/builder/ui/redirect/experience/params/base-id/${e}/page-sys-id/${a}/`;n&&(t+=`screen-id/${n}/`)}else{var t=`/now/build/ui/apps/${e}/pages/${a}/`;" +
@@ -739,7 +739,7 @@ function snuSlashCommandAddListener(omitWindowTopCheck = false) {
         if (e.key == 'Escape') snuSlashCommandHide(false, e);
         if (e.currentTarget.value.length <= 1 && e.key == 'Backspace') snuSlashCommandHide(true,e);
         var sameWindow = !(e.metaKey || e.ctrlKey) && (window.top.document.getElementById('gsft_main') != null ||
-            document.querySelector("[component-id]") != null);
+            document.querySelector("[macroponent-namespace]") != null);
         if (!e.currentTarget.value.startsWith("/")) {
             e.currentTarget.value = "/" + e.currentTarget.value
         }
@@ -785,7 +785,7 @@ function snuSlashCommandAddListener(omitWindowTopCheck = false) {
         if (typeof g_form == 'undefined') {
             try { //get if in iframe
                 g_form =
-                    (document.querySelector("#gsft_main") || document.querySelector("[component-id]")
+                    (document.querySelector("#gsft_main") || document.querySelector("[macroponent-namespace]")
                         .shadowRoot.querySelector("#gsft_main")).contentWindow.g_form;
             } catch (e) { }
         }
@@ -838,7 +838,7 @@ function snuSlashCommandAddListener(omitWindowTopCheck = false) {
                         var switchValue = snuslashswitches[prop].value;
                         var tableName = targeturl.split("_list.do")[0] || '';
                         if (!tableName){
-                            var gsft = (document.querySelector("#gsft_main") || document.querySelector("[component-id]")?.shadowRoot.querySelector("#gsft_main"));
+                            var gsft = (document.querySelector("#gsft_main") || document.querySelector("[macroponent-namespace]")?.shadowRoot.querySelector("#gsft_main"));
                             var doc = gsft ? gsft.contentWindow : window;
                             if (typeof doc.GlideList2 != 'undefined') tableName = doc.document.querySelector('#sys_target').value;
                             if (typeof doc.g_form != 'undefined') tableName =  g_form.getTableName();
@@ -1153,7 +1153,7 @@ function snuSlashCommandAddListener(omitWindowTopCheck = false) {
                 return;
             }
             else if (shortcut.startsWith("-")) {
-                var gsft = (document.querySelector("#gsft_main") || document.querySelector("[component-id]")?.shadowRoot.querySelector("#gsft_main"));
+                var gsft = (document.querySelector("#gsft_main") || document.querySelector("[macroponent-namespace]")?.shadowRoot.querySelector("#gsft_main"));
                 var doc = gsft ? gsft.contentWindow : window;
                 if (typeof doc.GlideList2 != 'undefined') {
                     var qry = doc.GlideList2.get(doc.document.querySelector('#sys_target')?.value);
@@ -1246,7 +1246,7 @@ function snuSlashCommandAddListener(omitWindowTopCheck = false) {
             else if (!snuslashcommands.hasOwnProperty(shortcut)) {
 
                 var inIFrame = (shortcut == snufilter.toLowerCase().slice(0, idx) && sameWindow)
-                var doc = (document.querySelector("#gsft_main") || document.querySelector("[component-id]")?.shadowRoot?.querySelector("#gsft_main"));
+                var doc = (document.querySelector("#gsft_main") || document.querySelector("[macroponent-namespace]")?.shadowRoot?.querySelector("#gsft_main"));
                 if (!doc) inIFrame = false;
                 if (e.target.className == "snutils") inIFrame = false;
 
@@ -1273,7 +1273,7 @@ function snuSlashCommandAddListener(omitWindowTopCheck = false) {
                         url = shortcut + "_list.do?sysparm_filter_pinned=true&sysparm_query=" + query;
 
                     if (inIFrame) {
-                        (document.querySelector("#gsft_main") || document.querySelector("[component-id]").shadowRoot.querySelector("#gsft_main")).src = url;
+                        (document.querySelector("#gsft_main") || document.querySelector("[macroponent-namespace]").shadowRoot.querySelector("#gsft_main")).src = url;
                     }
                     else {
                         if ((e.ctrlKey || e.metaKey) && e.shiftKey) {
@@ -1523,7 +1523,7 @@ function setSnuFilter(ev) {
 
 
 function snuDiffXml(shortcut, instance = '') {
-    var gsft = (document.querySelector("#gsft_main") || document.querySelector("[component-id]")?.shadowRoot.querySelector("#gsft_main"));
+    var gsft = (document.querySelector("#gsft_main") || document.querySelector("[macroponent-namespace]")?.shadowRoot.querySelector("#gsft_main"));
     var doc = gsft ? gsft.contentWindow : window;
 
     if (!doc.g_form) {
@@ -1667,7 +1667,7 @@ function snuResolve$(targeturl, query, e) {
 
 function snuResolveVariables(variableString){
 
-    let gsft = (document.querySelector("#gsft_main") || document.querySelector("[component-id]")?.shadowRoot.querySelector("#gsft_main"));
+    let gsft = (document.querySelector("#gsft_main") || document.querySelector("[macroponent-namespace]")?.shadowRoot.querySelector("#gsft_main"));
     let tableName = '';
     let sysId = '';
     let encodedQuery = '';
@@ -1725,7 +1725,9 @@ function snuResolveVariables(variableString){
         variableString = variableString.replace(/\$table/g,tableName);
         variableString = variableString.replace(/\$sysid/g,sysId);
     }
-    else if (location.pathname.startsWith("/now/servicenow-studio")){ //ServiceNow Studio
+    else if (location.pathname.startsWith("/now/servicenow-studio") ||
+        location.pathname.startsWith("/now/workflow-studio")
+    ){ //ServiceNow Studio or Workflow Studio
         const decodedUrl = decodeURIComponent(location.href);
         const urlObj = new URL(decodedUrl);
         const params = new URLSearchParams(urlObj.search);

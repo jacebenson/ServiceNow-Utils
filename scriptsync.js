@@ -491,7 +491,7 @@ function mirrorBgScript(scriptObj) {
             scriptTabCreated = false;
             var prefix = "document.";
             if (arrayOfTabs[0].url.includes("nav_to.do?uri=%2Fsys.scripts.do")) prefix = "gsft_main.document.";
-            else if (arrayOfTabs[0].url.includes("now/nav/ui/classic/params/target/sys.scripts.do")) prefix = "document.querySelector('[component-id]').shadowRoot.querySelector('#gsft_main').contentDocument.";
+            else if (arrayOfTabs[0].url.includes("now/nav/ui/classic/params/target/sys.scripts.do")) prefix = "document.querySelector('[macroponent-namespace]').shadowRoot.querySelector('#gsft_main').contentDocument.";
 
             console.log(arrayOfTabs);
             chrome.tabs.sendMessage(arrayOfTabs[0].id, {
