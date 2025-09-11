@@ -1,5 +1,10 @@
 # CHANGELOG.md
 
+## 9.1.1.2 (2025-09-11)
+Fixes / changes:
+  - Removed unused test pages 
+  - Update "who the heck edited this" block (Slack user ovarn)
+
 ## 9.1.1.0 (2025-09-08)
 Fixes / changes:
   - Sanitize Codesearch query text for regex (PR #586)

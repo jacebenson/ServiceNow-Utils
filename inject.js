@@ -4019,31 +4019,34 @@ function snuLoadInfoMessage() {
         let flds = res?.result;
         let html;
         if (flds) {
+            const add = (label, value) => `
+              <div style="font-size:8pt;">${label}</div>
+              <div>:</div>
+              <div>${value ?? 'n/a'}</div>
+            `;
+          
             html = `<span id='snuinfo' style='font-size:10pt'>[SN Utils] Record info for: ${g_form.getTableName()} - ${g_form.getUniqueValue()}
-            <div style='margin:5px; padding: 5px; font-size:9pt; font-family: Menlo, Monaco, Consolas, "Courier New", monospace;'>
-            <div><span style='font-size:8pt; display: inline-block; width: 90px; float: left;'>Created by :</span> ${flds?.sys_created_by}</div>
-            <div><span style='font-size:8pt; display: inline-block; width: 90px; float: left;'>Created on :</span> ${flds?.sys_created_on}</div>
-            <div><span style='font-size:8pt; display: inline-block; width: 90px; float: left;'>Updated by :</span> ${flds?.sys_updated_by}</div>
-            <div><span style='font-size:8pt; display: inline-block; width: 90px; float: left;'>Updated on :</span> ${flds?.sys_updated_on}</div>
-            <div><span style='font-size:8pt; display: inline-block; width: 90px; float: left; white-space: pre;'>Updates    :</span> ${flds?.sys_mod_count}</div>`;
-
-            if (flds?.sys_scope?.display_value) html += `
-            <div><span style='font-size:8pt; display: inline-block; width: 90px; float: left; white-space: pre;'>Scope      :</span> ${flds?.sys_scope?.display_value || 'n/a'}</div>`;
-            if (flds?.sys_domain?.display_value) html += `
-            <div><span style='font-size:8pt; display: inline-block; width: 90px; float: left; white-space: pre;'>Domain      :</span> ${flds?.sys_domain?.display_value || 'n/a'}</div>`;
-            
-            html += `</div>
-            <div>Slash commands: <a href="javascript:snuSlashCommandShow('/u user_name=${flds?.sys_created_by}',0)" >/u ${flds?.sys_created_by}</a> &nbsp;&nbsp;`;
-
-            if (flds?.sys_created_by != flds?.sys_updated_by && flds?.sys_updated_by != 'system')
-                html += ` <a href="javascript:snuSlashCommandShow('/u user_name=${flds?.sys_updated_by}',0)" >/u ${flds?.sys_updated_by}</a>&nbsp;&nbsp; `;
-            
-            html += `| &nbsp; <a href="javascript:snuSlashCommandShow('/vd',1)" >/vd</a> View data in a new tab &nbsp;
+            <div style='margin:5px; padding:5px; font-size:9pt; font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+                        display:grid; grid-template-columns:max-content 1ch auto; gap:2px 8px; align-items:baseline;'>
+              ${add('Created by',  flds?.sys_created_by)}
+              ${add('Created on',  flds?.sys_created_on)}
+              ${add('Updated by',  flds?.sys_updated_by)}
+              ${add('Updated on',  flds?.sys_updated_on)}
+              ${add('Updates',     flds?.sys_mod_count)}
+              ${flds?.sys_scope?.display_value  ? add('Scope',  flds.sys_scope.display_value)   : ''}
+              ${flds?.sys_domain?.display_value ? add('Domain', flds.sys_domain.display_value)  : ''}
+            </div>
+            <div>Slash commands: <a href="javascript:snuSlashCommandShow('/u user_name=${flds?.sys_created_by}',0)" >/u ${flds?.sys_created_by}</a> &nbsp;&nbsp;` +
+          
+            ((flds?.sys_created_by != flds?.sys_updated_by && flds?.sys_updated_by != 'system')
+              ? ` <a href="javascript:snuSlashCommandShow('/u user_name=${flds?.sys_updated_by}',0)" >/u ${flds?.sys_updated_by}</a>&nbsp;&nbsp; `
+              : "") +
+          
+            `| &nbsp; <a href="javascript:snuSlashCommandShow('/vd',1)" >/vd</a> View data in a new tab &nbsp;
             | <a href="javascript:snuSlashCommandShow('/vd -p',1)" >/vd -p</a> View data in a popup &nbsp;
             </div>
             Shortcuts: CTRL-V: Paste screenshot | CTRL-S: Save record | Double-click: Toggle Technical Names | 
-            More: <a href="https://www.arnoudkooi.com/cheatsheet/" target="_blank">cheatsheet</a></span>
-            `;
+            More: <a href="https://www.arnoudkooi.com/cheatsheet/" target="_blank">cheatsheet</a></span>`;
         }
         else html = 'Data could not be loaded...';
 
