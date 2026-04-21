@@ -7,18 +7,13 @@ without prior consent of the author/owner: Arnoud Kooi.
 Please open an issue to discuss new features, prior to starting development. 
 PR's without prior consult may not be accepted.
 
-## Heads-Up: Licensing Update With Upcoming Store App
-SN Utils will receive an updated license and documentation set as part of the upcoming SN Utils Store App release.
+## Heads-Up: Public GitHub Code Status
 
-This update will provide clearer definitions around:
-- usage in enterprise and consulting environments  
-- redistribution and bundling  
-- integration with commercial tools or services  
-- contribution and development expectations  
+The public GitHub repository is currently still based on SN Utils v9, so it is a bit behind the latest version.
+I expect to update it to the SN Utils v10 Community code in the next few weeks.
+Until that update is published, the repository may not fully reflect the current state of SN Utils.
+Feel free to use it for Issues and Discussions in the meantime
 
-Details will be published when the Store App becomes available.  
-For questions about organizational or commercial usage, please contact:  
-arnoud@snutils.com
 
 **FAQ**
 Question: Can I use SN Utils on non service-now.com domains?
